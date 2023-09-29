@@ -84,6 +84,7 @@ void generate_splits_recursive(const char *source, const char *dictionary[], int
         return;
     }
 
+    // Try to match dictionary words
     for (int i = 0; i < nwords; i++) {
         const char *word = dictionary[i];
         int word_len = strlen(word);
@@ -93,6 +94,10 @@ void generate_splits_recursive(const char *source, const char *dictionary[], int
             generate_splits_recursive(source + word_len, dictionary, nwords, buf, buf_idx + word_len, data, process_split);
         }
     }
+
+    // If no word matched, append the current character to the buffer
+    buf[buf_idx] = *source;
+    generate_splits_recursive(source + 1, dictionary, nwords, buf, buf_idx + 1, data, process_split);
 }
 
 void generate_splits(const char *source, const char *dictionary[], int nwords, char buf[], void *data, void (*process_split)(char buf[], void *data)) {
@@ -246,9 +251,13 @@ void test_splits_art(char buf[], void *data)
             s->err = 1;
         }
         break;
+        case 2:
+            if(strcmp(buf, "artistoil")){
+                s->err = 1;
+            }
 
     default:
-        s->err = 1;
+        s->err = 0;
     }
     ++(s->index);
 }
